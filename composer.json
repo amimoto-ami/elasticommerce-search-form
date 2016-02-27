@@ -1,0 +1,5 @@
+{
+  "require": {
+    "megumiteam/woocommerce-elasticsearch": "dev-master"
+  }
+}
