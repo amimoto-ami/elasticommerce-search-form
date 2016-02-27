@@ -43,7 +43,6 @@ class Elasticommerce_Search_Form {
 	 * @since 0.1
 	 */
 	public function init() {
-		//add_action( 'pre_get_posts', array( $this, 'pre_get_posts' ) );
 		add_filter( 'wpels_search', array( $this, 'search' ) );
 		add_filter( 'posts_search', array( $this, 'posts_search' ), 10, 2);
 	}
