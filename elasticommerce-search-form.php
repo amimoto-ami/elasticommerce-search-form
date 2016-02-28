@@ -14,8 +14,8 @@
 if ( ! escs_is_activate_woocommerce() ) {
 	$ESCS_Err = new ESCS_Error();
 	$msg = array(
-		__( 'Elasticommerce Need "WooCommerce" Plugin.' , 'elasticommerce-relateditem' ),
-		__( 'Please Activate it.' , 'elasticommerce-relateditem' ),
+		__( 'Elasticommerce Need "WooCommerce" Plugin.' , 'elasticommerce-search-form' ),
+		__( 'Please Activate it.' , 'elasticommerce-search-form' ),
 	);
 	$e = new WP_Error( 'Elasticommerce Activation Error', $msg );
 	$ESCS_Err->show_error_message( $e );
