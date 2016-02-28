@@ -14,7 +14,6 @@
 require_once dirname( __FILE__ ) . '/vendor/autoload.php';
 MegumiTeam\WooCommerceElasticsearch\Loader::get_instance()->init();
 
-//use Elastica\Client;
 use Elastica\Query;
 use Elastica\Query\QueryString;
 
@@ -73,13 +72,9 @@ class Elasticommerce_Search_Form {
 	public function search( $search_query ) {
 		try {
 			
-			$client = MegumiTeam\WooCommerceElasticsearch\Loader::get_instance()->get_client();
+			$es = MegumiTeam\WooCommerceElasticsearch\Loader::get_instance();
 
-			if ( ! $client ) {
-				throw new Exception( 'Couldn\'t make Elasticsearch Client. Parameter is not enough.' );
-			}
-			$url = parse_url(home_url());
-			$type = $client->getIndex( $url['host'] )->getType( 'product' );
+			$type = $es->client->getIndex( $es->index )->getType( $es->type );
 			$qs = new QueryString();
 			$qs->setQuery( $search_query );
 			$query_es = Query::create( $qs );
