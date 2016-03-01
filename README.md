@@ -1,4 +1,4 @@
-# elasticommerce-search-form
+# Elasticommerce Search Form
 ## Description
 This plugin is that WooComerce product search replace WordPress DB with Elasticsearch.
 
