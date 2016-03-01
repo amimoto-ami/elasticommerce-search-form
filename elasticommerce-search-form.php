@@ -58,13 +58,14 @@ class Elasticommerce_Search_Form {
 	}
 
 	public function posts_search( $search, $wp_query ) {
+		global $wpdb;
 
 		if ( $wp_query->is_search ) {
 			$search_query = get_search_query();
 			$post_ids = apply_filters( 'wpels_search', $search_query );
 
 			if ( !empty( $post_ids ) && is_array( $post_ids ) ) {
-				$search = 'AND wp_posts.ID IN (';
+				$search = 'AND '.$wpdb->posts.'.ID IN (';
 				$search .= implode(',',$post_ids);
 				$search .= ')';
 			}
