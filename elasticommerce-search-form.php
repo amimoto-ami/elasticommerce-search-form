@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Elasticommerce Search Form
- * Version: 1.0
+ * Version: 1.0.1
  * Description: Search Form using Elasticsearch
  * Author: horike
  * Author URI: https://amimoto-ami.com/
@@ -36,7 +36,7 @@ class Elasticommerce_Search_Form {
 	/**
 	 * Return a singleton instance of the current class
 	 *
-	 * @since 0.1
+	 * @since 1.0
 	 * @return object
 	 */
 	public static function get_instance() {
@@ -50,7 +50,7 @@ class Elasticommerce_Search_Form {
 	/**
 	 * Initialize.
 	 *
-	 * @since 0.1
+	 * @since 1.0
 	 */
 	public function init() {
 		add_filter( 'wpels_search', array( $this, 'search' ) );
@@ -79,7 +79,7 @@ class Elasticommerce_Search_Form {
 	 *
 	 * @param $search_query
 	 * @return true or WP_Error object
-	 * @since 0.1
+	 * @since 1.0
 	 */
 	public function search( $search_query ) {
 		try {
