@@ -4,7 +4,7 @@ Donate link: https://amimoto-ami.com/
 Tags: com
 Requires at least: 4.4
 Tested up to: 4.4.2
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -30,4 +30,7 @@ e.g.
 * First release.
 
 = 1.0.1 =
+* Bug fix.
+
+= 1.0.2 =
 * Bug fix.
