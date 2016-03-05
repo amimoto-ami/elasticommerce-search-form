@@ -55,8 +55,77 @@ class Elasticommerce_Search_Form {
 	public function init() {
 		add_filter( 'wpels_search', array( $this, 'search' ) );
 		add_filter( 'posts_search', array( $this, 'posts_search' ), 10, 2);
+		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
+		add_action( 'wp_head', array( $this, 'set_cookie_search_query' ) );
+		add_action( 'woocommerce_thankyou', array( $this, 'woocommerce_thankyou' ) );
 	}
 
+	/**
+	 * woocommerce_thankyou action hook. Set product code.
+	 *
+	 * @since 1.1
+	 * @return void
+	 */
+	public function woocommerce_thankyou( $order_id ) {
+		$order = wc_get_order($order_id);
+?>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+		var wc_esf_total_value = '<?php echo $order->calculate_totals(); ?>';
+
+		if ( $.cookie('elasticommerce_search_query') && wc_esf_total_value != '' ) {
+			$.get( 'http://example.com', { 'search_word':$.cookie('elasticommerce_search_query'),'total_value':wc_esf_total_value } );
+			$.removeCookie('elasticommerce_search_query');
+		}	
+	});
+</script>
+<?php
+	}
+
+	/**
+	 * wp head action hook. Set cookie search word
+	 *
+	 * @since 1.1
+	 * @return void
+	 */
+	public function set_cookie_search_query() {
+		if ( !is_search() ) {
+			return;
+		}
+?>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+		var COOKIE_NAME = 'elasticommerce_search_query';
+		var COOKIE_PATH = '/';
+		var search_word = '<?php the_search_query(); ?>';
+
+		var date = new Date();
+		date.setTime(date.getTime() + ( 1000 * 60 * 60 ));
+		$.cookie(COOKIE_NAME, search_word, { path: COOKIE_PATH, expires: date });
+	});
+</script>
+<?php
+	}
+
+	/**
+	 * wp_enqueue_scripts action hook. Set jQuery cookie
+	 *
+	 * @since 1.1
+	 * @return void
+	 */
+	public function wp_enqueue_scripts() {
+		wp_enqueue_script('jquery');
+		wp_register_script('jquery-cookie', plugins_url() . '/' . dirname( plugin_basename( __FILE__ ) ) .'/js/jquery.cookie.js', array('jquery'), '1.0');
+		wp_enqueue_script('jquery-cookie');
+	}
+
+	/**
+	 * posts_search filter hook.
+	 *
+	 * @param $search, $wp_query
+	 * @return String
+	 * @since 1.0
+	 */
 	public function posts_search( $search, $wp_query ) {
 		global $wpdb;
 
