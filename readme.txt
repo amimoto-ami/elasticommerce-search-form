@@ -17,11 +17,9 @@ We adopted the Elasticsearch to search engine. You can also search, such as a cu
 
 
 == Installation ==
-e.g.
-
 1. Upload `elasticommerce-search-form` to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
-3 Place set Elasticsearch Endpoint on `Settings > Woocommerce Elasticsearch`.
+3. Place set Elasticsearch Endpoint on `Settings > Woocommerce Elasticsearch`.
 
 == Screenshots ==
 
@@ -37,3 +35,6 @@ e.g.
 
 = 1.0.2 =
 * Bug fix.
+
+= 1.0.3 =
+* Update readme.txt
