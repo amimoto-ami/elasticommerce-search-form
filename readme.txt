@@ -44,5 +44,5 @@ Set up Elasticsearch below.
 = 1.0.2 =
 * Bug fix.
 
-= 1.0.3 =
+= 1.0.4 =
 * Update readme.txt
