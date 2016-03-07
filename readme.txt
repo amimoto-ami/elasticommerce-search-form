@@ -15,6 +15,14 @@ Add much extensions and power-up WooCommerce.
 
 We adopted the Elasticsearch to search engine. You can also search, such as a custom field by replacing the WordPress of standard search function. The accuracy of the product search feature dramatically improves in WooCommerce.
 
+= Contributors =
+* [Horike Takahiro](http://profiles.wordpress.org/horike)
+* [Hide Okamoto](https://profiles.wordpress.org/hideokamoto)
+
+= Suport WP-CLI =
+Set up Elasticsearch below.
+`wp elasticsearch setup --host=example.com --port=9200`
+
 
 == Installation ==
 1. Upload `elasticommerce-search-form` to the `/wp-content/plugins/` directory.
