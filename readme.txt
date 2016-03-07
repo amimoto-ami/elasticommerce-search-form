@@ -4,7 +4,7 @@ Donate link: https://amimoto-ami.com/plans/option-services/elasticommerce-servic
 Tags: elasticsearch,search,woocommerce
 Requires at least: 4.4
 Tested up to: 4.4.2
-Stable tag: 1.0.2
+Stable tag: 1.0.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
