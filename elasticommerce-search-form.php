@@ -23,6 +23,7 @@ if ( ! escs_is_activate_woocommerce() ) {
 	return;
 }
 require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+require_once dirname( __FILE__ ) . '/modules/dashboard.php';
 MegumiTeam\WooCommerceElasticsearch\Loader::get_instance()->init();
 
 use Elastica\Query;
