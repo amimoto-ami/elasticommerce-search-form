@@ -59,6 +59,19 @@ class Elasticommerce_Search_Form {
 		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
 		add_action( 'wp_head', array( $this, 'set_cookie_search_query' ) );
 		add_action( 'woocommerce_thankyou', array( $this, 'woocommerce_thankyou' ) );
+		add_action( 'wpels_inner_setting_form', array( $this, 'wpels_inner_setting_form' ) );
+	}
+	
+	public function wpels_inner_setting_form() {
+		$options = get_option( 'wpels_settings' );
+		?>
+		<table class="form-table">
+		<tr>
+		<th scope="row">Visual Service Endpoint</th>
+		<td><input type='text' name='wpels_settings[visual_service_endpoint]' value='<?php echo $options['visual_service_endpoint']; ?>'></td>
+		</tr>
+		</table>
+		<?php
 	}
 
 	/**
@@ -68,15 +81,42 @@ class Elasticommerce_Search_Form {
 	 * @return void
 	 */
 	public function woocommerce_thankyou( $order_id ) {
+		$options = get_option( 'wpels_settings' );
+		
+		if ( !isset( $options['visual_service_endpoint'] ) || empty($options['visual_service_endpoint']) ) {
+			return;
+		}
+
 		$order = wc_get_order($order_id);
+		$productinfo = array();
+		foreach( $order->get_items() as $item_id => $item ) {
+			$productinfo[] = array(
+								'product_id' => intval($item_id),
+								'count'      => intval(wc_get_order_item_meta($item_id, '_qty'))
+								);
+		}
+		
 ?>
 <script type="text/javascript">
 	jQuery(document).ready(function($){
 		var wc_esf_total_value = '<?php echo $order->calculate_totals(); ?>';
 
 		if ( $.cookie('elasticommerce_search_query') && wc_esf_total_value != '' ) {
-			$.get( 'http://example.com', { 'search_word':$.cookie('elasticommerce_search_query'),'total_value':wc_esf_total_value } );
-			$.removeCookie('elasticommerce_search_query');
+		    var data = { 
+		              searchword:$.cookie('elasticommerce_search_query'),
+		              productinfo:<?php echo json_encode($productinfo); ?>,
+		              totalvalue:wc_esf_total_value
+		              }
+			$.ajax( {
+			    url:'<?php echo trim(esc_url($options['visual_service_endpoint'])); ?>',
+			    method: "POST",
+			    crossDomain: true,
+			    data: JSON.stringify(data),
+			    success: function(response) {
+			      $.removeCookie('elasticommerce_search_query');
+			    }
+			  });
+			
 		}	
 	});
 </script>
