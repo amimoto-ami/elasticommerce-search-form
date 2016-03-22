@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/megumiteam/woocommerce-elasticsearch.git",
-                "reference": "b72069d15a18c032ef9758bd5e023f5ce9601792"
+                "reference": "39ceaf1c41a67152548d4c4b0e174350daa9004b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/megumiteam/woocommerce-elasticsearch/zipball/b72069d15a18c032ef9758bd5e023f5ce9601792",
-                "reference": "b72069d15a18c032ef9758bd5e023f5ce9601792",
+                "url": "https://api.github.com/repos/megumiteam/woocommerce-elasticsearch/zipball/39ceaf1c41a67152548d4c4b0e174350daa9004b",
+                "reference": "39ceaf1c41a67152548d4c4b0e174350daa9004b",
                 "shasum": ""
             },
             "require": {
@@ -38,7 +38,7 @@
                 }
             ],
             "description": "Woocommerce search replace Elasticsearch",
-            "time": "2016-03-05 05:09:14"
+            "time": "2016-03-18 12:46:39"
         },
         {
             "name": "psr/log",
