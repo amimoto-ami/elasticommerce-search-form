@@ -26,8 +26,28 @@ class Elasticommerce_Search_Form_Dashboard {
 	 */
 	public function init() {
 		add_filter( 'admin_menu', array( $this, 'admin_menu' ) );
-		add_filter( 'admin_print_scripts', array( $this, 'admin_print_scripts' ) );
+		add_action( 'admin_print_scripts-dashboard_page_ecss-dash', array( $this, 'admin_print_scripts' ) );
 		add_action( 'admin_footer', array( $this, 'admin_footer' ) );
+		add_action( 'admin_head-dashboard_page_ecss-dash', array( $this, 'admin_head' ) );
+	}
+
+	public function admin_head() {
+?>
+<style>
+    text {
+        font: 12px sans-serif;
+    }
+    svg {
+        display: block;
+    }
+    html, body, #chart1, svg {
+        margin: 0px;
+        padding: 0px;
+        height: 530px;
+        width: 100%;
+    }
+</style>
+<?php
 	}
 	
 	public function admin_menu() {
@@ -35,61 +55,106 @@ class Elasticommerce_Search_Form_Dashboard {
 	}
 	
 	public function dashboard() {
+		$options = get_option( 'wpels_settings' );
+		
+		if ( !isset( $options['visual_service_endpoint'] ) || empty($options['visual_service_endpoint']) ) {
+			return;
+		}
+
+		if ( isset( $_POST['start_date'] ) ) {
+			$start_date = (int) str_replace( '/', '', wp_unslash( $_POST['start_date'] ) );
+		} else {
+			$start_date = (int) date_i18n( 'Ymd', strtotime("-1 month")  );
+		}
+
+		if ( isset( $_POST['end_date'] ) ) {
+			$end_date = (int) str_replace( '/', '', wp_unslash( $_POST['end_date'] ) );
+		} else {
+			$end_date = (int) date_i18n( 'Ymd');
+		}
+
+		$response = wp_remote_get($options['visual_service_endpoint'] . '?start_date='.$start_date.'000000&end_date='.$end_date.'000000');
+		if( !is_wp_error( $response ) && $response["response"]["code"] === 200 ) {
+    		$response_body = json_decode($response["body"]);
+    		$items = array();
+    		foreach( $response_body->Items as $val ) {
+    			$items[$val->SearchWord] += $val->TotalValue;
+    		}
+    		arsort($items);
+    		
+    		$json_chart = array();
+    		foreach ( $items as $key => $item ) {
+    			$json_chart[] = array(
+    								'label' => $key,
+    								'value' => $item
+    								);
+    		} 
+		}
+		
+		
 ?>
 <div class="wrap">
 <?php screen_icon(); ?>
 
-<h2><?php _e( '検索ワードごとの売上' ); ?></h2>
+<h2><?php _e( 'Elasticommerce Search Service' ); ?></h2>
+<h3>検索ワードごとの売上高</h3>
+<form action="<?php echo self_link(); ?>" method="POST">
+<table class="form-table">
+<tr><th><?php _e( 'Display Period' ); ?></th><td><input type="text" name="start_date" value="<?php echo esc_attr($start_date); ?>"> - <input type="text" name="end_date" value="<?php echo esc_attr($end_date); ?>"> <input type="submit" value="Apply" class="button" id="submit" name="submit"></td></tr>
+</table>
+</form>
+<div id="chart1">
+    <svg></svg>
+</div>
 
-<div id="elasticommerce" style="height: 400px;"></div>
+<script>
+    var results = <?php echo json_encode($json_chart); ?>;
+    
+    
+console.log(results);
+    historicalBarChart = [
+        {
+            key: "Cumulative Return",
+            values: results
+        }
+    ];
+    nv.addGraph(function() {
+        var chart = nv.models.discreteBarChart()
+            .x(function(d) { return d.label })
+            .y(function(d) { return d.value })
+            .staggerLabels(true)
+            //.staggerLabels(historicalBarChart[0].values.length > 8)
+            .showValues(true)
+            .duration(250)
+            ;
+        chart.xAxis
+            .axisLabel("検索ワード");
+
+        chart.yAxis
+            .axisLabel('売上 (円)')
+            .tickFormat(d3.format(','));
+
+        //chart.showXAxis(true);
+        d3.select('#chart1 svg')
+            .datum(historicalBarChart)
+            .call(chart);
+        nv.utils.windowResize(chart.update);
+        return chart;
+    });
+</script>
 </div>
 <?php
 	}
 	
 	public function admin_print_scripts() {
-		wp_enqueue_style('morris_css', '//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css');
-		wp_enqueue_script('raphael_js', '//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js', false, '1.0');
-		wp_enqueue_script('morris_js', '//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js', false, '1.0');
+		wp_enqueue_script( 'd3', '//d3js.org/d3.v3.min.js', array(), '1.0', false );
+		wp_enqueue_script( 'nv.d3.js', plugins_url() . '/' . dirname( plugin_basename( __FILE__ ) ) .'/../js/nv.d3.min.js', array('d3'), '1.0', false );
+		wp_enqueue_style( 'nv.d3.css', plugins_url() . '/' . dirname( plugin_basename( __FILE__ ) ) .'/../css/nv.d3.min.css', array(), '1.0', false );
+		wp_enqueue_script( 'my-datepicker', plugins_url() . '/' . dirname( plugin_basename( __FILE__ ) ) .'/../js/datepicker.js', array('jquery-ui-datepicker'), '1.0', false );
+		wp_enqueue_style( 'jquery-ui-datepicker-theme', plugins_url() . '/' . dirname( plugin_basename( __FILE__ ) ) .'/../css/jquery-ui.css', array(), '1.0' );
 	}
-	
-	private function _cmp($a, $b){
-		if ($a['total_value'] == $b['total_value']) { return 0; }
-		else return ($a['total_value'] < $b['total_value']) ? -1 : 1;
-	}
-	
+
 	public function admin_footer() {
-		$response = wp_remote_get('https://example.com');
-		if( !is_wp_error( $response ) && $response["response"]["code"] === 200 ) {
-    		$response_body = json_decode($response["body"]);
-    		
-    		$items = array();
-    		foreach( $response_body->Items as $val ) {
-    			$items[$val->search_word] = $val->total_value;
-    		}
-    		arsort($items);
-		}
-?>
-<script>
-new Morris.Bar({
-  // ID of the element in which to draw the chart.
-  element: 'elasticommerce',
-  // Chart data records -- each entry in this array corresponds to a point on
-  // the chart.
-  data: [
-  <?php foreach( $items as $key => $val ): ?>
-    { post_id: '<?php echo $key; ?>', value: <?php echo esc_js(intval($val)); ?> },
-  <?php endforeach; ?>
-  ],
-  // The name of the data record attribute that contains x-values.
-  xkey: 'post_id',
-  // A list of names of data record attributes that contain y-values.
-  ykeys: ['value'],
-  // Labels for the ykeys -- will be displayed when you hover over the
-  // chart.
-  labels: ['売上'],
-});
-</script>
-<?php
 	}
 }
 Elasticommerce_Search_Form_Dashboard::get_instance()->init();
