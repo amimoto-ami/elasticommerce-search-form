@@ -91,7 +91,7 @@ class Elasticommerce_Search_Form {
 		$productinfo = array();
 		foreach( $order->get_items() as $item_id => $item ) {
 			$productinfo[] = array(
-								'product_id' => intval($item_id),
+								'product_id' => intval($item['product_id']),
 								'count'      => intval(wc_get_order_item_meta($item_id, '_qty'))
 								);
 		}

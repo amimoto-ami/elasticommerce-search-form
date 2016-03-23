@@ -46,6 +46,12 @@ class Elasticommerce_Search_Form_Dashboard {
         height: 530px;
         width: 100%;
     }
+    
+    svg.escs_piechart {
+
+            height: 350px !important;
+            width: 350px !important;
+        }
 </style>
 <?php
 	}
@@ -73,7 +79,9 @@ class Elasticommerce_Search_Form_Dashboard {
 			$end_date = (int) date_i18n( 'Ymd');
 		}
 
-		$response = wp_remote_get($options['visual_service_endpoint'] . '?start_date='.$start_date.'000000&end_date='.$end_date.'000000');
+
+
+		$response = wp_remote_get($options['visual_service_endpoint'] . '?start_date='.$start_date.'000000&end_date='.$end_date.'235959');
 		if( !is_wp_error( $response ) && $response["response"]["code"] === 200 ) {
     		$response_body = json_decode($response["body"]);
     		$items = array();
@@ -82,6 +90,32 @@ class Elasticommerce_Search_Form_Dashboard {
     		}
     		arsort($items);
     		
+    		$items_word = array();
+    		foreach( $items as $search_word => $total_value ) {
+    			$response_word = wp_remote_get($options['visual_service_endpoint'] . '?searchword='.urlencode($search_word).'&start_date='.$start_date.'000000&end_date='.$end_date.'235959');
+    			if( !is_wp_error( $response_word ) && $response_word["response"]["code"] === 200 ) {
+    				$response_body = json_decode($response_word["body"]);
+    				foreach ( $response_body as $val ) {
+    					foreach ( $val as $val_2 ) {
+    						foreach ( $val_2->ProductInfo as $info ) {
+    							$items_word[$search_word][$info->product_id] += $info->count;
+    						}
+    					}
+    				}
+    			}
+    		}			
+
+			$items_word_pie = array();
+			foreach ( $items_word as $search_word => $val ) {
+				foreach ( $val as $product_id => $count ) {
+					$product = new WC_Product( $product_id );
+					$items_word_pie[$search_word][] = array( 
+														'key' => $product->get_title(),
+														'y'   => intval($count)*intval($product->get_price())
+													);
+				}
+			}
+
     		$json_chart = array();
     		foreach ( $items as $key => $item ) {
     			$json_chart[] = array(
@@ -123,7 +157,6 @@ console.log(results);
             .x(function(d) { return d.label })
             .y(function(d) { return d.value })
             .staggerLabels(true)
-            //.staggerLabels(historicalBarChart[0].values.length > 8)
             .showValues(true)
             .duration(250)
             ;
@@ -134,13 +167,49 @@ console.log(results);
             .axisLabel('売上 (円)')
             .tickFormat(d3.format(','));
 
-        //chart.showXAxis(true);
         d3.select('#chart1 svg')
             .datum(historicalBarChart)
             .call(chart);
         nv.utils.windowResize(chart.update);
         return chart;
     });
+</script>
+
+<?php 
+$count = 1;
+foreach ( $items_word_pie as $searchword => $pie ) : ?>
+<h3>"<?php echo $searchword; ?>"の購入分布</h3>
+<svg id="escs_piechart<?php echo $count++; ?>" class="escs_piechart"></svg>
+<?php endforeach; ?>
+
+<script>
+<?php 
+$count = 1;
+foreach ( $items_word_pie as $pie ) : ?>
+    var piedata<?php echo $count++; ?> = <?php echo json_encode($pie); ?>;
+<?php endforeach; ?>
+
+    var height = 350;
+    var width = 350;
+<?php 
+$count = 1;
+foreach ( $items_word_pie as $pie ) : ?>
+    nv.addGraph(function() {
+        var chart = nv.models.pieChart()
+            .x(function(d) { return d.key })
+            .y(function(d) { return d.y })
+            .width(width)
+            .height(height);
+        d3.select("#escs_piechart<?php echo $count ?>")
+            .datum(piedata<?php echo $count++; ?>)
+            .transition().duration(1200)
+            .attr('width', width)
+            .attr('height', height)
+            .call(chart);
+
+        return chart;
+    });
+<?php endforeach; ?>
 </script>
 </div>
 <?php
