@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Elasticommerce Search Form
- * Version: 1.0.5
+ * Version: 1.0.6
  * Description: Search Form using Elasticsearch
  * Author: horike
  * Author URI: https://amimoto-ami.com/
@@ -60,7 +60,8 @@ class Elasticommerce_Search_Form {
 	public function posts_search( $search, $wp_query ) {
 		global $wpdb;
 
-		if ( !is_admin() && $wp_query->is_search ) {
+		$options = get_option( 'wpels_settings' );
+		if ( !is_admin() && $wp_query->is_search && $options !== false ) {
 			$search_query = get_search_query();
 			$post_ids = apply_filters( 'wpels_search', $search_query );
 
