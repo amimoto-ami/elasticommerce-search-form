@@ -4,7 +4,7 @@ Donate link: https://amimoto-ami.com/plans/option-services/elasticommerce-servic
 Tags: elasticsearch,search,woocommerce
 Requires at least: 4.4
 Tested up to: 4.4.2
-Stable tag: 1.0.6
+Stable tag: 1.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -52,3 +52,6 @@ Set up Elasticsearch below.
 
 = 1.0.6 =
 * Bug fix.
+
+= 1.1 =
+* Release visual service. [Elasticommerce Search Service](https://github.com/megumiteam/serverless-elasticommerce-search-service)

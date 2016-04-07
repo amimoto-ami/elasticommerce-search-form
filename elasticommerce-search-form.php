@@ -23,6 +23,7 @@ if ( ! escs_is_activate_woocommerce() ) {
 	return;
 }
 require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+require_once dirname( __FILE__ ) . '/modules/dashboard.php';
 MegumiTeam\WooCommerceElasticsearch\Loader::get_instance()->init();
 
 use Elastica\Query;
@@ -55,8 +56,118 @@ class Elasticommerce_Search_Form {
 	public function init() {
 		add_filter( 'wpels_search', array( $this, 'search' ) );
 		add_filter( 'posts_search', array( $this, 'posts_search' ), 10, 2);
+		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
+		add_action( 'wp_head', array( $this, 'set_cookie_search_query' ) );
+		add_action( 'woocommerce_thankyou', array( $this, 'woocommerce_thankyou' ) );
+		add_action( 'wpels_inner_setting_form', array( $this, 'wpels_inner_setting_form' ) );
+	}
+	
+	public function wpels_inner_setting_form() {
+		$options = get_option( 'wpels_settings' );
+		
+		?>
+		<table class="form-table">
+		<tr>
+		<th scope="row">Visual Service Endpoint</th>
+		<td><input type='text' name='wpels_settings[visual_service_endpoint]' value='<?php echo $options['visual_service_endpoint']; ?>'></td>
+		</tr>
+		</table>
+		<?php
 	}
 
+	/**
+	 * woocommerce_thankyou action hook. Set product code.
+	 *
+	 * @since 1.1
+	 * @return void
+	 */
+	public function woocommerce_thankyou( $order_id ) {
+		$options = get_option( 'wpels_settings' );
+		
+		if ( !isset( $options['visual_service_endpoint'] ) || empty($options['visual_service_endpoint']) ) {
+			return;
+		}
+
+		$order = wc_get_order($order_id);
+		$productinfo = array();
+		foreach( $order->get_items() as $item_id => $item ) {
+			$productinfo[] = array(
+								'product_id' => intval($item['product_id']),
+								'count'      => intval(wc_get_order_item_meta($item_id, '_qty'))
+								);
+		}
+		
+?>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+		var wc_esf_total_value = '<?php echo $order->calculate_totals(); ?>';
+
+		if ( $.cookie('elasticommerce_search_query') && wc_esf_total_value != '' ) {
+		    var data = { 
+		              searchword:$.cookie('elasticommerce_search_query'),
+		              productinfo:<?php echo json_encode($productinfo); ?>,
+		              totalvalue:wc_esf_total_value
+		              }
+			$.ajax( {
+			    url:'<?php echo trim(esc_url($options['visual_service_endpoint'])); ?>',
+			    method: "POST",
+			    crossDomain: true,
+			    data: JSON.stringify(data),
+			    success: function(response) {
+			      $.removeCookie('elasticommerce_search_query');
+			    }
+			  });
+			
+		}	
+	});
+</script>
+<?php
+	}
+
+	/**
+	 * wp head action hook. Set cookie search word
+	 *
+	 * @since 1.1
+	 * @return void
+	 */
+	public function set_cookie_search_query() {
+		if ( !is_search() ) {
+			return;
+		}
+?>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+		var COOKIE_NAME = 'elasticommerce_search_query';
+		var COOKIE_PATH = '/';
+		var search_word = '<?php the_search_query(); ?>';
+
+		var date = new Date();
+		date.setTime(date.getTime() + ( 1000 * 60 * 60 ));
+		$.cookie(COOKIE_NAME, search_word, { path: COOKIE_PATH, expires: date });
+	});
+</script>
+<?php
+	}
+
+	/**
+	 * wp_enqueue_scripts action hook. Set jQuery cookie
+	 *
+	 * @since 1.1
+	 * @return void
+	 */
+	public function wp_enqueue_scripts() {
+		wp_enqueue_script('jquery');
+		wp_register_script('jquery-cookie', plugins_url() . '/' . dirname( plugin_basename( __FILE__ ) ) .'/js/jquery.cookie.js', array('jquery'), '1.0');
+		wp_enqueue_script('jquery-cookie');
+	}
+
+	/**
+	 * posts_search filter hook.
+	 *
+	 * @param $search, $wp_query
+	 * @return String
+	 * @since 1.0
+	 */
 	public function posts_search( $search, $wp_query ) {
 		global $wpdb;
 
