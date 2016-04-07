@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Elasticommerce Search Form
- * Version: 1.0.6
+ * Version: 1.1
  * Description: Search Form using Elasticsearch
  * Author: horike
  * Author URI: https://amimoto-ami.com/
