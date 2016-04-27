@@ -1,5 +1,5 @@
 === Elasticommerce Search Form ===
-Contributors: horike,hideokamoto,megumithemes
+Contributors: horike,hideokamoto,megumithemes,kel-dc
 Donate link: https://amimoto-ami.com/plans/option-services/elasticommerce-services-option/
 Tags: elasticsearch,search,woocommerce
 Requires at least: 4.4
@@ -8,12 +8,13 @@ Stable tag: 1.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-This plugin is that WooComerce product search replace WordPress DB with Elasticsearch.
+This plugin replaces WordPress DB with Elasticsearch in WooCommerce product search.
 
 == Description ==
-Add much extensions and power-up WooCommerce.
+Elasticommerce Search Form adds extra extensions and powers up WooCommerce.
 
-We adopted the Elasticsearch to search engine. You can also search, such as a custom field by replacing the WordPress of standard search function. The accuracy of the product search feature dramatically improves in WooCommerce.
+We adopted Elasticsearch as the search engine. Searching becomes more refined by allowing search in custom fields by replacing WordPress standard search function.
+The accuracy of product search feature is dramatically improved in WooCommerce.
 
 = Contributors =
 * [Horike Takahiro](http://profiles.wordpress.org/horike)
@@ -25,9 +26,9 @@ Set up Elasticsearch below.
 
 
 == Installation ==
-1. Upload `elasticommerce-search-form` to the `/wp-content/plugins/` directory.
+1. Upload `elasticommerce-search-form` to `/wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Place set Elasticsearch Endpoint on `Settings > Woocommerce Elasticsearch`.
+3. Place set Elasticsearch Endpoint on `Settings > WooCommerce Elasticsearch`.
 
 == Screenshots ==
 
@@ -55,3 +56,4 @@ Set up Elasticsearch below.
 
 = 1.1 =
 * Release visual service. [Elasticommerce Search Service](https://github.com/megumiteam/serverless-elasticommerce-search-service)
+Status API Training Shop Blog About
