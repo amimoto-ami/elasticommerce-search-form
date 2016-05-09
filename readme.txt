@@ -1,5 +1,5 @@
 === Elasticommerce Search Form ===
-Contributors: horike,hideokamoto,megumithemes
+Contributors: horike,hideokamoto,megumithemes,amimotoami
 Donate link: https://amimoto-ami.com/plans/option-services/elasticommerce-services-option/
 Tags: elasticsearch,search,woocommerce
 Requires at least: 4.4
